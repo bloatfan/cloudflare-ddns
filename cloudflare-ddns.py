@@ -50,6 +50,27 @@ def deleteEntries(type):
             print("🗑️ Deleted stale record " + identifier)
 
 
+def getIPsFromIPIPDotNet():
+    global ipv4_enabled
+
+    a = None
+
+    try:
+        resp = requests.get('https://myip.ipip.net/json')
+        resp = json.loads(resp.text)
+        a = resp['data']['ip']
+    except Exception as e:
+        raise e
+
+    ips = {}
+    ips["ipv4"] = {
+        "type": "A",
+        "ip": a
+    }
+
+    return ips
+
+
 def getIPs():
     a = None
     aaaa = None
@@ -303,11 +324,11 @@ if __name__ == '__main__':
                 killer = GracefulExit()
                 prev_ips = None
                 while True:
-                    updateIPs(getIPs())
+                    updateIPs(getIPsFromIPIPDotNet())
                     if killer.kill_now.wait(ttl):
                         break
             else:
                 print("❓ Unrecognized parameter '" +
                       sys.argv[1] + "'. Stopping now.")
         else:
-            updateIPs(getIPs())
+            updateIPs(getIPsFromIPIPDotNet())
